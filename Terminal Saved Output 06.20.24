@@ -1,0 +1,24 @@
+Last login: Mon Apr 29 11:56:00 on console
+
+The default interactive shell is now zsh.
+To update your account to use zsh, please run `chsh -s /bin/zsh`.
+For more details, please visit https://support.apple.com/kb/HT208050.
+macbook-air-42:~ MarthaMac$ git config --global credential.helper osxkeychain
+macbook-air-42:~ MarthaMac$ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

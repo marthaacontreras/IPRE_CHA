@@ -1,27 +1,168 @@
 ---
 title: "Master CHA1-3 Combined"
-output: html_document
 date: "2024-06-20"
+output:
+  html_document:
+    theme: cerulean
+    toc: yes
+    toc_float:
+      collapsed: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+This setup is commonly used at the beginning of an R Markdown document to configure global settings for code chunks, ensuring consistent behavior throughout the document.
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rio)
+library(janitor)
 ```
-
-## Including Plots
-
-You can also embed plots, for example:
 
 ```{r}
-plot(pressure)
+CHA_2020_4 <- rio::import("https://github.com/wellsdata/DJNF_Merrill/raw/main/data/CHA_Data_24_053R.xlsx", sheet = "2020Q4") %>% 
+  mutate(quarter="2020Q4") %>% 
+  clean_names()
+
+CHA_2021_1 <- rio::import("https://github.com/wellsdata/DJNF_Merrill/raw/main/data/CHA_Data_24_053R.xlsx", sheet = "2021Q1") %>% 
+  mutate(quarter="2021Q1") %>% 
+  clean_names()
+
+CHA_2021_2 <- rio::import("https://github.com/wellsdata/DJNF_Merrill/raw/main/data/CHA_Data_24_053R.xlsx", sheet = "2021Q2") %>% 
+  mutate(quarter="2021Q2") %>% 
+  clean_names()
+
+CHA_2021_3 <- rio::import("https://github.com/wellsdata/DJNF_Merrill/raw/main/data/CHA_Data_24_053R.xlsx", sheet = "2021Q3") %>% 
+  mutate(quarter="2021Q3") %>% 
+  clean_names() %>% 
+  rename(vendor_id = vendor_i)
+
+CHA_2021_4 <- rio::import("https://github.com/wellsdata/DJNF_Merrill/raw/main/data/CHA_Data_24_053R.xlsx", sheet = "2021Q4") %>% 
+  mutate(quarter="2021Q4") %>% 
+  clean_names() %>% 
+  rename(vendor_id = vendor_i)
+
+CHA_2022_1 <- rio::import("https://github.com/wellsdata/DJNF_Merrill/raw/main/data/CHA_Data_24_053R.xlsx", sheet = "2022Q1") %>% 
+  mutate(quarter="2022Q1") %>% 
+  clean_names() %>% 
+  rename(vendor_id = vendor_i)
+
+CHA_2022_2 <- rio::import("https://github.com/wellsdata/DJNF_Merrill/raw/main/data/CHA_Data_24_053R.xlsx", sheet = "2022Q2") %>% 
+  mutate(quarter="2022Q2") %>% 
+  clean_names() %>% 
+  rename(vendor_id = vendor_i)
+
+CHA_2022_3 <- rio::import("https://github.com/wellsdata/DJNF_Merrill/raw/main/data/CHA_Data_24_053R.xlsx", sheet = "2022Q3") %>% 
+  mutate(quarter="2022Q3") %>% 
+  clean_names() %>% 
+  rename(vendor_id = vendor_i)
+
+CHA_2022_4 <- rio::import("https://github.com/wellsdata/DJNF_Merrill/raw/main/data/CHA_Data_24_053R.xlsx", sheet = "2022Q4") %>% 
+  mutate(quarter="2022Q4") %>% 
+  clean_names() %>% 
+  rename(vendor_id = vendor_i)
+
+CHA_2023_1 <- rio::import("https://github.com/wellsdata/DJNF_Merrill/raw/main/data/CHA_Data_24_053R.xlsx", sheet = "2023Q1") %>% 
+  mutate(quarter="2023Q1") %>% 
+  clean_names() %>% 
+  rename(vendor_id = vendor_i)
+
+CHA_2023_2 <- rio::import("https://github.com/wellsdata/DJNF_Merrill/raw/main/data/CHA_Data_24_053R.xlsx", sheet = "2023Q2") %>% 
+  mutate(quarter="2023Q2") %>% 
+  clean_names() %>% 
+  rename(vendor_id = vendor_i)
+
+CHA_2023_3 <- rio::import("https://github.com/wellsdata/DJNF_Merrill/raw/main/data/CHA_Data_24_053R.xlsx", sheet = "2023Q3") %>% 
+  mutate(quarter="2023Q3") %>% 
+  clean_names() %>% 
+  rename(vendor_id = vendor_i)
+
+CHA_2023_4 <- rio::import("https://github.com/wellsdata/DJNF_Merrill/raw/main/data/CHA_Data_24_053R.xlsx", sheet = "2023Q4") %>% 
+  mutate(quarter="2023Q4") %>% 
+  clean_names() 
 ```
+
+```{r}
+
+CHA1 <- rbind(CHA_2020_4, CHA_2021_1, CHA_2021_2, CHA_2021_3, CHA_2021_4, CHA_2022_1, CHA_2022_2, CHA_2022_3, CHA_2022_4, CHA_2023_1, CHA_2023_2, CHA_2023_3, CHA_2023_4)
+
+write.csv(CHA1,"CHA1.csv")
+```
+
+```{r}
+
+CHA2_2019 <- import("CHA2(Jan2019-April2024).xlsx", sheet = "2019") %>% 
+  mutate(year="2019") %>% 
+  clean_names()
+
+CHA2_2020 <- import("CHA2(Jan2019-April2024).xlsx", sheet = "2020") %>% 
+  mutate(year="2020") %>% 
+  clean_names()
+
+CHA2_2021 <- import("CHA2(Jan2019-April2024).xlsx", sheet = "2021") %>% 
+  mutate(year="2021") %>% 
+  clean_names()
+
+CHA2_2022 <- import("CHA2(Jan2019-April2024).xlsx", sheet = "2022") %>% 
+  mutate(year="2022") %>% 
+  clean_names()
+
+CHA2_2023 <- import("CHA2(Jan2019-April2024).xlsx", sheet = "2023") %>% 
+  mutate(year="2023") %>% 
+  clean_names()
+
+CHA2_2024 <- import("CHA2(Jan2019-April2024).xlsx", sheet = "2024 April") %>% 
+  mutate(year="2024") %>% 
+  clean_names()
+
+CHA2 <- rbind(CHA2_2019, CHA2_2020, CHA2_2021, CHA2_2022, CHA2_2023, CHA2_2024)
+
+CHA2$vendor_zip <- as.numeric(CHA2$vendor_zip)
+CHA2$payment_month_number <- as.numeric(CHA2$payment_month_number)
+CHA2$bedroom_size <- as.numeric(CHA2$bedroom_size)
+
+write.csv(CHA2,"CHA2.csv")
+
+colnames(CHA2)
+
+summary(CHA2$vendor_address_line_1)
+
+CHA2 %>% 
+  count(vendor_address_line_1) %>% 
+  arrange(desc(n)) %>% 
+  head(10) 
+
+#because there are multiple entries per month (grrrr), going to have to go with total payment amount to find any valuable data analysis 
+
+sum(CHA2$payment_amount, na.rm = TRUE)
+# [1] 2,867,739,566
+mean(CHA2$payment_amount, na.rm = TRUE)
+# 845.3352
+vendors <- CHA2 %>% 
+  select(vendor_name, vendor_address_line_1, payment_amount, year, zip) %>% 
+  group_by(vendor_address_line_1) %>% 
+  summarize(
+    vendor_name,
+    year,
+    zip,
+    Total_Payment = sum(payment_amount, na.rm=TRUE),
+    Mean_Payment = mean(payment_amount, na.rm=TRUE),
+    ) %>%  
+  arrange(desc(Total_Payment))
+
+# leases_per_owner <- CHA2 %>% 
+#   count(vendor_name) %>% 
+#   arrange(n) 
+ 
+
+```
+
+```{r}
+
+
+```
+
+
+
+

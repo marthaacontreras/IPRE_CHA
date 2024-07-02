@@ -206,6 +206,63 @@ zip_list <- CHA2 %>%
 
 ```
 Census Tract HUV zipcode data 
+
+```{r}
+Census_Zip_2019 <- import("Zipcode_2019 HCV Census .xlsx") %>% 
+  clean_names() %>% 
+
+Census_Zip_2020 <- import("Zipcode_2020 HCV Census .xlsx") %>% 
+  clean_names()
+
+Census_Zip_2021 <- import("Zipcode_2021 HCV Census .xlsx") %>% 
+  clean_names()
+
+Census_Zip_2022 <- import("Zipcode_2022 HCV Census.xlsx") %>% 
+  clean_names()
+
+Census_Zip_2023 <- import("Zipcode_2023 HCV Census.xlsx") %>% 
+  clean_names()
+
+Census_Zip <- rbind(Census_Zip_2019, Census_Zip_2020, Census_Zip_2021, Census_Zip_2022, Census_Zip_2023) %>% 
+  filter(program_label == "Housing Choice Vouchers") %>% 
+  rename(zip_codes = entities) %>% 
+  rename(date = quarter) %>% 
+  select(date, zip_codes, program_label, total_units, pct_reported, people_per_unit, rent_per_month, hh_income, pct_disabled_all, pct_age62plus, pct_minority) %>% 
+ 
+   # Ensure zip_codes are treated as characters, not numbers
+
+Census_Zip$zip_codes <- as.character(Census_Zip$zip_codes)
+
+# List of zip codes to filter
+zip_codes_to_filter <- c("60014", "60026", "60050", "60077", "60085", "60098", 
+                         "60104", "60155", "60201", "60302", "60409", "60411", 
+                         "60419", "60422", "60425", "60426", "60428", "60429", 
+                         "60432", "60438", "60445", "60458", "60465", "60471", 
+                         "60473", "60478", "60601", "60602", "60603", "60605", 
+                         "60606", "60607", "60608", "60609", "60610", "60611", 
+                         "60612", "60613", "60614", "60615", "60616", "60617", 
+                         "60618", "60619", "60620", "60621", "60622", "60623", 
+                         "60624", "60625", "60626", "60628", "60629", "60630", 
+                         "60631", "60632", "60633", "60634", "60636", "60637", 
+                         "60638", "60639", "60640", "60641", "60642", "60643", 
+                         "60644", "60645", "60646", "60647", "60649", "60651", 
+                         "60652", "60653", "60654", "60655", "60656", "60657", 
+                         "60659", "60660", "60661", "60707", "60803", "60805", 
+                         "60827")
+
+# Filter the data
+Census_CHA_Zip <- Census_Zip %>%
+  filter(zip_codes %in% zip_codes_to_filter)
+  
+#filter for the 86 zip codes --> analyze the census data 
+  
+#map it on flourish 
+
+#write a draft (website) with the embedded data visuals and send as a draft
+
+```
+
+
 ```{r}
 #web scraping for all data sets with zip codes 
 

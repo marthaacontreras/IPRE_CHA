@@ -184,7 +184,9 @@ vendors_year <- CHA2 %>%
  
 
 ```
-Zipcodes extracted from CHA2 dataset
+
+Zip codes extracted from CHA2 dataset
+
 ```{r}
 # zip_list <- CHA2 %>% 
 #   select(year, zip)%>% 
@@ -204,12 +206,28 @@ zip_list <- CHA2 %>%
   group_by(zip) %>%              # Group by year and the modified zip code
   summarise(count = n())
 
+# # List of 86 ZIP codes from CHA2
+# zip_codes <- c("60014", "60026", "60050", "60077", "60085", "60098", "60104",
+#                "60155", "60201", "60302", "60409", "60411", "60419", "60422",
+#                "60425", "60426", "60428", "60429", "60432", "60438", "60445",
+#                "60458", "60465", "60471", "60473", "60478", "60601", "60602",
+#                "60603", "60605", "60606", "60607", "60608", "60609", "60610",
+#                "60611", "60612", "60613", "60614", "60615", "60616", "60617",
+#                "60618", "60619", "60620", "60621", "60622", "60623", "60624",
+#                "60625", "60626", "60628", "60629", "60630", "60631", "60632",
+#                "60633", "60634", "60636", "60637", "60638", "60639", "60640",
+#                "60641", "60642", "60643", "60644", "60645", "60646", "60647",
+#                "60649", "60651", "60652", "60653", "60654", "60655", "60656",
+#                "60657", "60659", "60660", "60661", "60707", "60803", "60805",
+#                "60827")
+#The Amount calulated per zip code is skewed because uneven amount of months per property and even entries per month (going to need to use CHA1 for zipcode breakdown per amount but will limit the time frame for data)
 ```
-Census Tract HUV zipcode data 
+
+Census Tract HUV zip code data, filtered for the 86 zip codes from CHA2.
 
 ```{r}
 Census_Zip_2019 <- import("Zipcode_2019 HCV Census .xlsx") %>% 
-  clean_names() %>% 
+  clean_names()  
 
 Census_Zip_2020 <- import("Zipcode_2020 HCV Census .xlsx") %>% 
   clean_names()
@@ -227,13 +245,12 @@ Census_Zip <- rbind(Census_Zip_2019, Census_Zip_2020, Census_Zip_2021, Census_Zi
   filter(program_label == "Housing Choice Vouchers") %>% 
   rename(zip_codes = entities) %>% 
   rename(date = quarter) %>% 
-  select(date, zip_codes, program_label, total_units, pct_reported, people_per_unit, rent_per_month, hh_income, pct_disabled_all, pct_age62plus, pct_minority) %>% 
+  select(date, zip_codes, program_label, total_units, people_per_unit, rent_per_month, hh_income, pct_disabled_all, pct_age62plus, pct_minority)
  
-   # Ensure zip_codes are treated as characters, not numbers
+#Filter for the 86 zip codes --> analyze the census data
 
 Census_Zip$zip_codes <- as.character(Census_Zip$zip_codes)
 
-# List of zip codes to filter
 zip_codes_to_filter <- c("60014", "60026", "60050", "60077", "60085", "60098", 
                          "60104", "60155", "60201", "60302", "60409", "60411", 
                          "60419", "60422", "60425", "60426", "60428", "60429", 
@@ -250,11 +267,25 @@ zip_codes_to_filter <- c("60014", "60026", "60050", "60077", "60085", "60098",
                          "60659", "60660", "60661", "60707", "60803", "60805", 
                          "60827")
 
-# Filter the data
+#data is a breakdown per year per zip (5 zips because 5 years)
 Census_CHA_Zip <- Census_Zip %>%
-  filter(zip_codes %in% zip_codes_to_filter)
+  filter(zip_codes %in% zip_codes_to_filter) %>% 
+
+#Total census data per zip code from 2019 to 2023
+Census_CHA_Zip_Total <- Census_CHA_Zip %>% 
+  group_by(zip_codes) %>% 
+  summarize(
+    Total_Units = sum(total_units, na.rm=TRUE), 
+    People_per_Unit = sum(people_per_unit, na.rm=TRUE),
+    Rent_per_month = sum(rent_per_month, na.rm=TRUE),
+    HH_Income = sum(hh_income, na.rm=TRUE),
+    Pct_Disabled_All = sum(pct_disabled_all, na.rm=TRUE),
+    Pct_Age62Plus = sum(pct_age62plus, na.rm=TRUE),
+    Pct_Minority = sum(pct_minority, na.rm=TRUE),
+    
+    )
   
-#filter for the 86 zip codes --> analyze the census data 
+
   
 #map it on flourish 
 
@@ -264,139 +295,11 @@ Census_CHA_Zip <- Census_Zip %>%
 
 
 ```{r}
-#web scraping for all data sets with zip codes 
 
-# # List of 86 ZIP codes from CHA2
-# zip_codes <- c("60014", "60026", "60050", "60077", "60085", "60098", "60104",
-#                "60155", "60201", "60302", "60409", "60411", "60419", "60422",
-#                "60425", "60426", "60428", "60429", "60432", "60438", "60445",
-#                "60458", "60465", "60471", "60473", "60478", "60601", "60602",
-#                "60603", "60605", "60606", "60607", "60608", "60609", "60610",
-#                "60611", "60612", "60613", "60614", "60615", "60616", "60617",
-#                "60618", "60619", "60620", "60621", "60622", "60623", "60624",
-#                "60625", "60626", "60628", "60629", "60630", "60631", "60632",
-#                "60633", "60634", "60636", "60637", "60638", "60639", "60640",
-#                "60641", "60642", "60643", "60644", "60645", "60646", "60647",
-#                "60649", "60651", "60652", "60653", "60654", "60655", "60656",
-#                "60657", "60659", "60660", "60661", "60707", "60803", "60805",
-#                "60827")
-#The Amount calulated per zip code is skewed because uneven amount of months per property and even entries per month (going to need to use CHA1 for zipcode breakdown per amount but will limit the time frame for data)
 
-#using R Selium 
- 
-#MASSIVE ATTEMPT TO USE WEB SCRAPING AND FETCHING CODE BUT HIT TOO MANY ROAD BLOCKS. IGNORE ALL OF CODE BELOW. USELESS
-# 
-# #Start the Selenium server
-# remDr <- remoteDriver(remoteServerAddr = "localhost",
-#                       port = 4444,
-#                       browserName = "chrome")
-# 
-# # Navigate to the webpage
-# remDr$navigate("https://www.huduser.gov/portal/datasets/assthsg.html#query_2009-2023")
-# 
-# # Wait for the page to load (you can adjust the timeout as needed)
-# Sys.sleep(5)
-# 
-# # Get the HTML content
-# html <- remDr$getPageSource()[[1]]
-# 
-# # Parse the HTML content using a package like rvest
-# library(rvest)
-# html_doc <- read_html(html)
-# 
-# 
-# # Select the 2019 option from the select_year dropdown
-# remDr$findElement(using = "xpath", value = "//select[@id='Year']/option[@value='2019']")$click()
-# 
-# # Select the "Zipcode" option from the summary_level dropdown
-# remDr$findElement(using = "xpath", value = "//select[@id='summary_level']/option[@value='zipcode||11']")$click()
-#  
-# #Insert a zip code value
-# remDr$findElement(using = "xpath", value = "//input[@id='second_level_zipcode']")$sendKeysToElement(list("60014"))
-# 
-# # Select the Housing Choice Vouchers program
-# remDr$findElement(using = "xpath", value = "//select[@id='program']/option[@value='program_HCV']")$click()
-# 
-# # Select a variable
-# remDr$findElement(using = "xpath", value = "//select[@id='variable']/option[@value='all']")$click()
-#  
-# # Click the "Get Results" button
-# remDr$findElement(using = "xpath", value = "//input[@value='Get Results']")$click()
-# 
-# # Wait for the data to load
-# Sys.sleep(2)
-# 
-# # Extract the data
-# data <- remDr$findElement(using = "xpath", value = "//div[@id='datafromdb']")$getText()
-# 
-# # Close the Selenium server
-# remDr$close()
-# driver[["server"]]$stop()
-# 
-# # Process the data
-# data <- gsub("\r\n", "", data)
-# data <- strsplit(data, "\n")[[1]]
-# data <- data[-1]  # Remove the header
-# 
-# # Convert the data to a data frame
-# data_df <- data.frame(t(data))
-# 
-# # Print the data frame
-# print(data_df)
-# 
-# ```
-# 
-# ```{r}
-# 
-# #Step 1: Navigate to the web page and extract elements
-# # Get the webpage
-# url <- "https://www.huduser.gov/portal/datasets/assthsg.html#query_2009-2023" 
-# webpage <- read_html(url)
-# 
-# # Extract the elements you need
-# # For example, to get the values for the year select box:
-# year_options <- webpage %>% 
-#   html_nodes("2019", "2020", "2021", "2022_2020census", "2023") %>% #inputting the VALUE of the search bar options looking at the html page
-#   html_text()
-# 
-# # Extract the elements for the summary level:
-# summary_level_options <- webpage %>% 
-#   html_nodes("Select a Year", "Select a Summary Level", "Select a Program Level", "Select a Variable Level") %>% 
-#   html_text()
-# 
-# #Step 2: Formulate and Submit Your Search Query
-# search_query <- list(
-#   year = "2019", # Replace with your desired year
-#   zip_code = "60014" # Replace with your desired zip code
-# )
-# 
-# # You might need to adjust the names of the variables in the query list based on the HTML structure of the search page.
-# # See if the webpage has an input for the zip code.
-# zip_code_input <- webpage %>% html_nodes("input[name='zipcode||11']") 
-# 
-# # You might need to adjust the name "zip_code" in the query to match what the page expects based on the HTML structure of the page.
-# 
-# #Step3: Submit the Search Query and Retrieve the Results
-# # Submit the search query using POST request:
-# response <- POST(url, body = search_query)
-# 
-# # Check if the request was successful
-# if (response$status_code == 200) {
-#   # Extract the HTML content of the results page
-#   results_page <- content(response, as = "text") 
-#   # Parse the results page
-#   results_html <- read_html(results_page)
-# 
-#   # Extract the data from the results page
-#   # For example, to extract table data:
-#   results_table <- results_html %>%
-#     html_nodes("table") %>%
-#     html_table()
-# 
-#   # Process and save the results data
-#   # ...
-# } else {
-#   print("Error submitting search query.")
-# }
+
+
+
+```
 
 

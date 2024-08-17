@@ -1,0 +1,29 @@
+---
+title: "HCV/Census Data"
+output: html_document
+date: "2024-08-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE, warning=FALSE}
+install.packages(c("rvest", "httr", "stringr"))
+install.packages("tidycensus")
+
+library(tidyverse)
+library(rio)
+library(janitor)
+library(dplyr)
+
+library(tidycensus)
+  census_api_key("d3f099b8ea52680ae3ab2390bb80a4838fc95603", install = TRUE)
+
+```
+
+```{r}
+
+
+
+```

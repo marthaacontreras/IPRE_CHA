@@ -30,7 +30,7 @@ library(stringr)
 library(RSelenium)
 
 ```
-
+CHA 1 data (money to vendors is skewed bc flawed data (Hap to Owner column of 2021Q2), so avoided using after initial memo):
 ```{r}
 CHA_2020_4 <- rio::import("https://github.com/wellsdata/DJNF_Merrill/raw/main/data/CHA_Data_24_053R.xlsx", sheet = "2020Q4") %>% 
   mutate(quarter="2020Q4") %>% 
@@ -100,7 +100,7 @@ CHA1 <- rbind(CHA_2020_4, CHA_2021_1, CHA_2021_2, CHA_2021_3, CHA_2021_4, CHA_20
 
 write.csv(CHA1,"CHA1.csv")
 ```
-
+CHA2 data
 ```{r}
 
 CHA2_2019 <- import("CHA2(Jan2019-April2024).xlsx", sheet = "2019") %>% 
@@ -181,7 +181,81 @@ vendors_year <- CHA2 %>%
 # leases_per_owner <- CHA2 %>% 
 #   count(vendor_name) %>% 
 #   arrange(n) 
- 
+
+#Top vendors paid by CHA by vendor id 
+vendors_by_id <- CHA2 %>% 
+  select(vendor_name, vendor_address_line_1, payment_amount, year, zip, vendor_id) %>% 
+  group_by(vendor_id) %>% 
+  summarize(
+    # vendor_name,
+    # year,
+    # zip,
+    Total_Payment = sum(payment_amount, na.rm=TRUE), 
+    Mean_Payment = mean(payment_amount, na.rm=TRUE),
+    ) %>%  
+  arrange(desc(Total_Payment))
+
+top_vendors_based_on_id <- CHA2 %>% 
+  filter(vendor_id %in% c("v0019379", "v0040721", "v0003121", "vp002409", "v0034028", "v0042878", "v0038810", "v0027505")) %>% 
+  select(vendor_name, vendor_id) %>% 
+  mutate(
+    Vendor = case_when(
+      vendor_id == "v0019379" ~ "Top_Vendor",
+      vendor_id == "v0040721" ~ "Second_Vendor",
+      vendor_id == "v0003121" ~ "Third_Vendor",
+      vendor_id == "vp002409" ~ "Fourth_Vendor",
+      vendor_id == "v0034028" ~ "Fifth_Vendor",
+      vendor_id == "v0042878" ~ "Sixth_Vendor",
+      vendor_id == "v0038810" ~ "Seventh_Vendor",
+      vendor_id == "v0027505" ~ "Eighth_Vendor"
+    )
+  ) %>%
+  group_by(Vendor) %>% 
+  summarize(vendor_names = paste(unique(vendor_name), collapse = ", ")) %>% 
+  pivot_wider(names_from = Vendor, values_from = vendor_names)
+  
+# atlas <- CHA2 %>% 
+#   select(vendor_id, address, payment_amount, year) %>% 
+#   filter(!vendor_id=="v0040721") %>% 
+#   filter(!address=="S Colfax Ave") %>% 
+#   group_by(vendor_id) %>%
+#   summarise(
+#     # vendor_name,
+#     # year,
+#     # zip,
+#     Total_Payment = sum(payment_amount, na.rm=TRUE),
+#     Vendor = vendor_id
+#     ) %>%  
+#   arrange(desc(Total_Payment))
+
+icarus <- CHA2 %>% 
+  select(vendor_id, year, payment_amount) %>%
+  filter(vendor_id =="v0034886") %>% 
+  group_by(vendor_id, year) %>% 
+  summarize(
+    Total_Payment = sum(payment_amount, na.rm=TRUE)
+  ) %>% 
+  arrange(desc(Total_Payment))
+  
+atlas <- CHA2 %>% 
+  select(vendor_id, year, payment_amount) %>%
+  filter(vendor_id =="v0040721") %>% 
+  group_by(vendor_id, year) %>% 
+  summarize(
+    Total_Payment = sum(payment_amount, na.rm=TRUE)
+  ) %>% 
+  arrange(desc(Total_Payment))
+
+vendor_names_by_top_address <- CHA2 %>% 
+  select(vendor_address_line_1, vendor_name) %>% 
+  filter(vendor_address_line_1 %in% 
+           c("C/O WPD MANAGEMENT LLC", "5454 S SHORE DR", "549 W RANDOLPH ST FL 2", "9252 N KILBOURN AVE", "329 W 18TH ST", "1 N LA SALLE ST STE 400", "3706 W MONTROSE AVE", "1020 W MONTROSE AVE", "1912 S STATE ST", "1131 WEST WARNER RD STE 102", "150 W MAPLE ST, OFFICE", "350 W HUBBARD ST STE 500", "C/O BRINSHORE DEVELOPMENT LLC", "3115 W AUGUSTA BLVD", "2101 S MICHIGAN AVE")
+    ) %>% 
+  group_by(vendor_address_line_1) %>% 
+  summarize(
+    Vendor = paste(unique(vendor_name))
+  )
+
 
 ```
 
@@ -202,8 +276,8 @@ zip_list_per_year <- CHA2 %>%
   summarise(count = n())               # Count occurrences
 
 zip_list <- CHA2 %>% 
-  mutate(zip = substr(zip, 1, 5)) %>%  # Extract first 6 digits of the zip code
-  group_by(zip) %>%              # Group by year and the modified zip code
+  mutate(zip = substr(zip, 1, 5)) %>%  # Extract first 5 digits of the zip code
+  group_by(zip) %>%              # Group by the modified zip code
   summarise(count = n())
 
 # # List of 86 ZIP codes from CHA2
@@ -220,7 +294,7 @@ zip_list <- CHA2 %>%
 #                "60649", "60651", "60652", "60653", "60654", "60655", "60656",
 #                "60657", "60659", "60660", "60661", "60707", "60803", "60805",
 #                "60827")
-#The Amount calulated per zip code is skewed because uneven amount of months per property and even entries per month (going to need to use CHA1 for zipcode breakdown per amount but will limit the time frame for data)
+#The Amount calculated per zip code is skewed because uneven amount of months per property and even entries per month (going to need to use CHA1 if need to find zip code breakdown per amount but will also need to limit the time frame for data)
 ```
 
 Census Tract HUV zip code data, filtered for the 86 zip codes from CHA2.
@@ -245,7 +319,7 @@ Census_Zip <- rbind(Census_Zip_2019, Census_Zip_2020, Census_Zip_2021, Census_Zi
   filter(program_label == "Housing Choice Vouchers") %>% 
   rename(zip_codes = entities) %>% 
   rename(date = quarter) %>% 
-  select(date, zip_codes, program_label, total_units, people_per_unit, rent_per_month, hh_income, pct_disabled_all, pct_age62plus, pct_minority)
+  select(date, zip_codes, program_label, total_units, people_per_unit, rent_per_month, spending_per_month, hh_income, pct_disabled_all, pct_age62plus, pct_minority)
  
 #Filter for the 86 zip codes --> analyze the census data
 
@@ -270,26 +344,24 @@ zip_codes_to_filter <- c("60014", "60026", "60050", "60077", "60085", "60098",
 #data is a breakdown per year per zip (5 zips because 5 years)
 Census_CHA_Zip <- Census_Zip %>%
   filter(zip_codes %in% zip_codes_to_filter) %>% 
+  select(date, zip_codes, program_label, total_units, people_per_unit, rent_per_month, spending_per_month, hh_income, pct_disabled_all, pct_age62plus, pct_minority)
 
 #Total census data per zip code from 2019 to 2023
 Census_CHA_Zip_Total <- Census_CHA_Zip %>% 
   group_by(zip_codes) %>% 
   summarize(
     Total_Units = sum(total_units, na.rm=TRUE), 
-    People_per_Unit = sum(people_per_unit, na.rm=TRUE),
-    Rent_per_month = sum(rent_per_month, na.rm=TRUE),
-    HH_Income = sum(hh_income, na.rm=TRUE),
-    Pct_Disabled_All = sum(pct_disabled_all, na.rm=TRUE),
-    Pct_Age62Plus = sum(pct_age62plus, na.rm=TRUE),
-    Pct_Minority = sum(pct_minority, na.rm=TRUE),
+    People_per_Unit = mean(people_per_unit, na.rm=TRUE),
+    Rent_per_month = mean(rent_per_month, na.rm=TRUE),
+    Spending_per_Month = mean(spending_per_month, na.rm=TRUE),
+    HH_Income = mean(hh_income, na.rm=TRUE),
+    Pct_Disabled_All = mean(pct_disabled_all, na.rm=TRUE),
+    Pct_Age62Plus = mean(pct_age62plus, na.rm=TRUE),
+    Pct_Minority = mean(pct_minority, na.rm=TRUE)
     
     )
   
-
-  
-#map it on flourish 
-
-#write a draft (website) with the embedded data visuals and send as a draft
+summary(Census_CHA_Zip_Total)
 
 ```
 

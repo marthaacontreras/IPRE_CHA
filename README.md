@@ -16,5 +16,6 @@ I uploaded all three CHA datasets and combined their individual data sheets into
 
 I also sifted through HUD census data for the most prevalent HCV vendor and tenant zip codes—determined using the CHA2 dataset. 
 
-In order to see the code used to analyze CHA1, dowload the HCV-Census.Rmd file and follow the same steps. That data analysis Github page can be found here:
+In order to see the code used to analyze CHA1, dowload the HCV-Census.Rmd file and follow the same steps. That data analysis Github page with additional coding resources from the Dow Jones News Fund training camp can be found here:
+https://github.com/marthaacontreras/DJNF-Project
 
